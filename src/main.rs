@@ -80,8 +80,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     if let Ok(json) = serde_json::from_str::<FeatureCollection>(&resp) {
         println!("{:#?}", json);
+    } else if let Ok(json) = serde_json::from_str::<serde_json::Value>(&resp) {
+        println!("{:#?}", json);
     } else {
-        println!("{:#?}", serde_json::from_str::<serde_json::Value>(&resp));
+        println!("{:#?}", resp);
     }
 
     Ok(())
