@@ -53,8 +53,14 @@ struct FeatureCollection {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // TODO: avoid duplication of string literal template?
+    let rapid_site_url = format!("https://services.arcgis.com/neT9SoYxizqTHZPH/arcgis/rest/services/{}/FeatureServer/0/query", "Join_Features_to_COVID_19_Testing_Locations_DB_WFL1___DCGov_Testing_Locations");
+
+    let _test_yourself_url = format!("https://services.arcgis.com/neT9SoYxizqTHZPH/arcgis/rest/services/{}/FeatureServer/0/query", "Test_Yourself_End_of_Day");
+           // ("where", "1=1"),
+
     let client = reqwest::Client::new();
-    let resp = client.get("https://services.arcgis.com/neT9SoYxizqTHZPH/arcgis/rest/services/Join_Features_to_COVID_19_Testing_Locations_DB_WFL1___DCGov_Testing_Locations/FeatureServer/0/query")
+    let resp = client.get(rapid_site_url)
     .query(&[
            ("f", "json"),
            ("cacheHint","true"),
