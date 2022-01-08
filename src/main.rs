@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc, serde::ts_milliseconds};
 use chrono_tz::US::Eastern;
 use derivative::Derivative;
 use std::fmt;
-use serde::{Deserialize, Serialize};
+use serde::{de, Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 #[derive(Derivative)]
@@ -14,8 +14,8 @@ struct RapidSiteAttributes {
     datetime_of_inventory: DateTime<Utc>,
     #[serde(rename(deserialize = "How_Many_Tests_Left"))]
     tests: usize,
-    #[serde(rename(deserialize = "Is_Last_Inventory"))]
-    is_last_inventory: String,
+    #[serde(rename(deserialize = "Is_Last_Inventory"), deserialize_with = "deserialize_bool")]
+    is_last_inventory: bool,
     #[serde(rename(deserialize = "ObjectId"))]
     id: usize,
     #[serde(rename(deserialize = "TYS_Rapid_Site_Name"))]
@@ -24,6 +24,18 @@ struct RapidSiteAttributes {
 
 fn human_datetime(d: &DateTime<Utc>, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", d.with_timezone(&Eastern).to_rfc2822())
+}
+
+fn deserialize_bool<'de, D>(deserializer: D) -> Result<bool, D::Error>
+where
+    D: de::Deserializer<'de>,
+{
+    let s: &str = de::Deserialize::deserialize(deserializer)?;
+    match s {
+        "yes" => Ok(true),
+        "no" => Ok(false),
+        _ => Err(de::Error::unknown_variant(s, &["yes", "no"])),
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
