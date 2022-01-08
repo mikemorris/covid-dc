@@ -75,10 +75,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         ])
         .send()
         .await?
-        .json::<FeatureCollection>()
+        .text()
         .await?;
 
-    println!("{:#?}", resp);
+    if let Ok(json) = serde_json::from_str::<FeatureCollection>(&resp) {
+        println!("{:#?}", json);
+    } else {
+        println!("{:#?}", serde_json::from_str::<serde_json::Value>(&resp));
+    }
 
     Ok(())
 }
